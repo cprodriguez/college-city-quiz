@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>College City Quiz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Teko:wght@400;600&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f5f2ec;
+    --card: #ffffff;
+    --border: #e0dbd0;
+    --text: #1a1a18;
+    --muted: #7a7669;
+    --accent: #1f4e2b;
+    --accent-light: #e6f0e9;
+    --accent-mid: #3b7a50;
+    --danger: #8b2020;
+    --danger-light: #fdeaea;
+    --success: #1f4e2b;
+    --success-light: #e6f0e9;
+    --warn-light: #fef6e4;
+    --warn: #7a5200;
+    --conf-sec: #1D9E75;
+    --conf-b10: #185FA5;
+    --conf-acc: #993C1D;
+    --conf-b12: #BA7517;
+    --conf-p12: #3C3489;
+    --conf-mw: #533B8A;
+    --conf-ind: #5F5E5A;
+  }
+
+  body {
+    background: var(--bg);
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 0 3rem;
+  }
+
+  header {
+    width: 100%;
+    background: var(--accent);
+    color: #fff;
+    text-align: center;
+    padding: 1.25rem 1rem 1rem;
+    margin-bottom: 1.5rem;
+  }
+  header h1 {
+    font-family: 'Teko', sans-serif;
+    font-size: 2.2rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    line-height: 1;
+  }
+  header p {
+    font-size: 0.85rem;
+    opacity: 0.75;
+    margin-top: 4px;
+    letter-spacing: 0.02em;
+  }
+
+  #game {
+    width: 100%;
+    max-width: 460px;
+    padding: 0 1rem;
+  }
+
+  /* progress */
+  #progress-wrap {
+    height: 5px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 1.1rem;
+  }
+  #progress-bar {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 3px;
+    transition: width 0.4s ease;
+    width: 0%;
+  }
+
+  /* scorebar */
+  #scorebar {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 1.1rem;
+  }
+  .pill {
+    flex: 1;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 7px 10px;
+    font-size: 12px;
+    color: var(--muted);
+    text-align: center;
+  }
+  .pill strong {
+    display: block;
+    font-size: 17px;
+    font-weight: 500;
+    color: var(--text);
+    line-height: 1.2;
+    font-family: 'Teko', sans-serif;
+    letter-spacing: 0.02em;
+  }
+  .pill.streak { background: var(--warn-light); border-color: #f0d080; color: var(--warn); }
+  .pill.streak strong { color: var(--warn); }
+
+  /* school card */
+  #school-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.25rem 1.25rem 1.1rem;
+    margin-bottom: 1rem;
+    text-align: center;
+  }
+  #conf-badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 500;
+    padding: 3px 11px;
+    border-radius: 20px;
+    margin-bottom: 10px;
+    letter-spacing: 0.03em;
+  }
+  #school-name {
+    font-family: 'Teko', sans-serif;
+    font-size: 2rem;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.1;
+    letter-spacing: 0.02em;
+  }
+  #school-nickname {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 3px;
+  }
+  #state-display {
+    margin-top: 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--accent-light);
+    border: 1px solid #b5d4b8;
+    border-radius: 8px;
+    padding: 6px 14px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--accent);
+  }
+  #state-display .label { font-size: 11px; font-weight: 400; color: var(--accent-mid); }
+
+  /* city input area */
+  .section-label {
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 7px;
+  }
+  #city-input {
+    width: 100%;
+    padding: 11px 14px;
+    font-size: 16px;
+    font-family: 'DM Sans', sans-serif;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    background: var(--card);
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.15s;
+    margin-bottom: 1rem;
+  }
+  #city-input:focus { border-color: var(--accent); }
+  #city-input:disabled { opacity: 0.55; background: #f0ede7; }
+  #city-input.correct-input { border-color: var(--success); background: var(--success-light); }
+  #city-input.wrong-input { border-color: var(--danger); background: var(--danger-light); }
+
+  /* submit btn */
+  #submit-btn {
+    width: 100%;
+    padding: 13px;
+    border-radius: 8px;
+    border: none;
+    background: var(--accent);
+    color: #fff;
+    font-family: 'Teko', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: background 0.12s, transform 0.08s;
+    margin-bottom: 10px;
+  }
+  #submit-btn:hover { background: #174024; }
+  #submit-btn:active { transform: scale(0.98); }
+  #submit-btn:disabled { background: #b0b8b0; cursor: default; transform: none; }
+
+  /* result banner */
+  #result-banner {
+    display: none;
+    border-radius: 8px;
+    padding: 11px 14px;
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 10px;
+    line-height: 1.45;
+  }
+  #result-banner.show { display: block; }
+  #result-banner.win { background: var(--success-light); color: var(--success); border: 1px solid #b5d4b8; }
+  #result-banner.lose { background: var(--danger-light); color: var(--danger); border: 1px solid #f0b8b8; }
+  #result-banner.partial { background: var(--warn-light); color: var(--warn); border: 1px solid #f0d080; }
+
+  /* next btn */
+  #next-btn {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1.5px solid var(--border);
+    background: var(--card);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    display: none;
+    transition: background 0.12s;
+    color: var(--text);
+  }
+  #next-btn.show { display: block; }
+  #next-btn:hover { background: var(--bg); }
+
+  /* end screen */
+  #end-screen {
+    display: none;
+    text-align: center;
+    padding: 2rem 0.5rem;
+  }
+  #end-screen.show { display: block; }
+  #trophy { font-size: 3.5rem; margin-bottom: 0.75rem; }
+  #end-title {
+    font-family: 'Teko', sans-serif;
+    font-size: 2.2rem;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.1;
+    margin-bottom: 6px;
+  }
+  #end-sub { font-size: 15px; color: var(--muted); margin-bottom: 1.5rem; }
+  #end-breakdown {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1rem 1.25rem;
+    text-align: left;
+    margin-bottom: 1.25rem;
+    font-size: 13.5px;
+  }
+  .breakdown-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px 0;
+    border-bottom: 1px solid var(--border);
+    gap: 8px;
+  }
+  .breakdown-row:last-child { border-bottom: none; }
+  .breakdown-school { font-weight: 500; flex: 1; }
+  .breakdown-answer { color: var(--muted); font-size: 13px; }
+  .bd-correct { color: var(--success); font-weight: 500; }
+  .bd-wrong { color: var(--danger); }
+  #play-again-btn {
+    width: 100%;
+    padding: 13px;
+    border-radius: 8px;
+    border: none;
+    background: var(--accent);
+    color: #fff;
+    font-family: 'Teko', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: background 0.12s;
+  }
+  #play-again-btn:hover { background: #174024; }
+
+  @media (max-width: 400px) {
+    header h1 { font-size: 1.8rem; }
+    #school-name { font-size: 1.6rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>College City Quiz</h1>
+  <p>Name the city — Division I BCS schools</p>
+</header>
+
+<div id="game">
+  <div id="progress-wrap"><div id="progress-bar"></div></div>
+
+  <div id="scorebar">
+    <div class="pill"><span class="label">Score</span><strong id="score-val">0</strong></div>
+    <div class="pill"><span class="label">Question</span><strong id="q-val">1 / 10</strong></div>
+    <div class="pill streak"><span class="label">Streak 🔥</span><strong id="streak-val">0</strong></div>
+  </div>
+
+  <div id="school-card">
+    <div id="conf-badge"></div>
+    <div id="school-name"></div>
+    <div id="school-nickname"></div>
+    <div id="state-display">
+      <span class="label">State:</span>
+      <span id="state-name"></span>
+    </div>
+  </div>
+
+  <div id="play-area">
+    <div class="section-label">What city is this school in?</div>
+    <input id="city-input" type="text" placeholder="Type the city…" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+    <button id="submit-btn" disabled>Submit</button>
+    <div id="result-banner"></div>
+    <button id="next-btn">Next school →</button>
+  </div>
+
+  <div id="end-screen">
+    <div id="trophy"></div>
+    <div id="end-title"></div>
+    <div id="end-sub"></div>
+    <div id="end-breakdown"></div>
+    <button id="play-again-btn">Play Again</button>
+  </div>
+</div>
+
+<script>
+const SCHOOLS = [
+  {name:"Alabama",nick:"Crimson Tide",conf:"SEC",state:"Alabama",city:"Tuscaloosa"},
+  {name:"Auburn",nick:"Tigers",conf:"SEC",state:"Alabama",city:"Auburn"},
+  {name:"Arizona",nick:"Wildcats",conf:"Big 12",state:"Arizona",city:"Tucson"},
+  {name:"Arizona State",nick:"Sun Devils",conf:"Big 12",state:"Arizona",city:"Tempe"},
+  {name:"Arkansas",nick:"Razorbacks",conf:"SEC",state:"Arkansas",city:"Fayetteville"},
+  {name:"Cal",nick:"Golden Bears",conf:"ACC",state:"California",city:"Berkeley"},
+  {name:"UCLA",nick:"Bruins",conf:"Big Ten",state:"California",city:"Los Angeles"},
+  {name:"USC",nick:"Trojans",conf:"Big Ten",state:"California",city:"Los Angeles"},
+  {name:"Stanford",nick:"Cardinal",conf:"ACC",state:"California",city:"Stanford"},
+  {name:"Colorado",nick:"Buffaloes",conf:"Big 12",state:"Colorado",city:"Boulder"},
+  {name:"Florida",nick:"Gators",conf:"SEC",state:"Florida",city:"Gainesville"},
+  {name:"Florida State",nick:"Seminoles",conf:"ACC",state:"Florida",city:"Tallahassee"},
+  {name:"Miami",nick:"Hurricanes",conf:"ACC",state:"Florida",city:"Coral Gables"},
+  {name:"UCF",nick:"Knights",conf:"Big 12",state:"Florida",city:"Orlando"},
+  {name:"Georgia",nick:"Bulldogs",conf:"SEC",state:"Georgia",city:"Athens"},
+  {name:"Georgia Tech",nick:"Yellow Jackets",conf:"ACC",state:"Georgia",city:"Atlanta"},
+  {name:"Illinois",nick:"Fighting Illini",conf:"Big Ten",state:"Illinois",city:"Champaign"},
+  {name:"Northwestern",nick:"Wildcats",conf:"Big Ten",state:"Illinois",city:"Evanston"},
+  {name:"Indiana",nick:"Hoosiers",conf:"Big Ten",state:"Indiana",city:"Bloomington"},
+  {name:"Notre Dame",nick:"Fighting Irish",conf:"Independent",state:"Indiana",city:"Notre Dame"},
+  {name:"Purdue",nick:"Boilermakers",conf:"Big Ten",state:"Indiana",city:"West Lafayette"},
+  {name:"Iowa",nick:"Hawkeyes",conf:"Big Ten",state:"Iowa",city:"Iowa City"},
+  {name:"Iowa State",nick:"Cyclones",conf:"Big 12",state:"Iowa",city:"Ames"},
+  {name:"Kansas",nick:"Jayhawks",conf:"Big 12",state:"Kansas",city:"Lawrence"},
+  {name:"Kansas State",nick:"Wildcats",conf:"Big 12",state:"Kansas",city:"Manhattan"},
+  {name:"Kentucky",nick:"Wildcats",conf:"SEC",state:"Kentucky",city:"Lexington"},
+  {name:"LSU",nick:"Tigers",conf:"SEC",state:"Louisiana",city:"Baton Rouge"},
+  {name:"Maryland",nick:"Terrapins",conf:"Big Ten",state:"Maryland",city:"College Park"},
+  {name:"Michigan",nick:"Wolverines",conf:"Big Ten",state:"Michigan",city:"Ann Arbor"},
+  {name:"Michigan State",nick:"Spartans",conf:"Big Ten",state:"Michigan",city:"East Lansing"},
+  {name:"Minnesota",nick:"Golden Gophers",conf:"Big Ten",state:"Minnesota",city:"Minneapolis"},
+  {name:"Mississippi State",nick:"Bulldogs",conf:"SEC",state:"Mississippi",city:"Starkville"},
+  {name:"Ole Miss",nick:"Rebels",conf:"SEC",state:"Mississippi",city:"Oxford"},
+  {name:"Missouri",nick:"Tigers",conf:"SEC",state:"Missouri",city:"Columbia"},
+  {name:"Nebraska",nick:"Cornhuskers",conf:"Big Ten",state:"Nebraska",city:"Lincoln"},
+  {name:"Rutgers",nick:"Scarlet Knights",conf:"Big Ten",state:"New Jersey",city:"Piscataway"},
+  {name:"North Carolina",nick:"Tar Heels",conf:"ACC",state:"North Carolina",city:"Chapel Hill"},
+  {name:"NC State",nick:"Wolfpack",conf:"ACC",state:"North Carolina",city:"Raleigh"},
+  {name:"Duke",nick:"Blue Devils",conf:"ACC",state:"North Carolina",city:"Durham"},
+  {name:"Wake Forest",nick:"Demon Deacons",conf:"ACC",state:"North Carolina",city:"Winston-Salem"},
+  {name:"Ohio State",nick:"Buckeyes",conf:"Big Ten",state:"Ohio",city:"Columbus"},
+  {name:"Cincinnati",nick:"Bearcats",conf:"Big 12",state:"Ohio",city:"Cincinnati"},
+  {name:"Oklahoma",nick:"Sooners",conf:"SEC",state:"Oklahoma",city:"Norman"},
+  {name:"Oklahoma State",nick:"Cowboys",conf:"Big 12",state:"Oklahoma",city:"Stillwater"},
+  {name:"Oregon",nick:"Ducks",conf:"Big Ten",state:"Oregon",city:"Eugene"},
+  {name:"Oregon State",nick:"Beavers",conf:"Pac-12",state:"Oregon",city:"Corvallis"},
+  {name:"Penn State",nick:"Nittany Lions",conf:"Big Ten",state:"Pennsylvania",city:"University Park"},
+  {name:"Pittsburgh",nick:"Panthers",conf:"ACC",state:"Pennsylvania",city:"Pittsburgh"},
+  {name:"South Carolina",nick:"Gamecocks",conf:"SEC",state:"South Carolina",city:"Columbia"},
+  {name:"Clemson",nick:"Tigers",conf:"ACC",state:"South Carolina",city:"Clemson"},
+  {name:"Tennessee",nick:"Volunteers",conf:"SEC",state:"Tennessee",city:"Knoxville"},
+  {name:"Vanderbilt",nick:"Commodores",conf:"SEC",state:"Tennessee",city:"Nashville"},
+  {name:"Baylor",nick:"Bears",conf:"Big 12",state:"Texas",city:"Waco"},
+  {name:"TCU",nick:"Horned Frogs",conf:"Big 12",state:"Texas",city:"Fort Worth"},
+  {name:"Texas",nick:"Longhorns",conf:"SEC",state:"Texas",city:"Austin"},
+  {name:"Texas A&M",nick:"Aggies",conf:"SEC",state:"Texas",city:"College Station"},
+  {name:"Texas Tech",nick:"Red Raiders",conf:"Big 12",state:"Texas",city:"Lubbock"},
+  {name:"Houston",nick:"Cougars",conf:"Big 12",state:"Texas",city:"Houston"},
+  {name:"Utah",nick:"Utes",conf:"Big 12",state:"Utah",city:"Salt Lake City"},
+  {name:"BYU",nick:"Cougars",conf:"Big 12",state:"Utah",city:"Provo"},
+  {name:"Utah State",nick:"Aggies",conf:"Mountain West",state:"Utah",city:"Logan"},
+  {name:"Virginia",nick:"Cavaliers",conf:"ACC",state:"Virginia",city:"Charlottesville"},
+  {name:"Virginia Tech",nick:"Hokies",conf:"ACC",state:"Virginia",city:"Blacksburg"},
+  {name:"Washington",nick:"Huskies",conf:"Big Ten",state:"Washington",city:"Seattle"},
+  {name:"Washington State",nick:"Cougars",conf:"Pac-12",state:"Washington",city:"Pullman"},
+  {name:"West Virginia",nick:"Mountaineers",conf:"Big 12",state:"West Virginia",city:"Morgantown"},
+  {name:"Wisconsin",nick:"Badgers",conf:"Big Ten",state:"Wisconsin",city:"Madison"},
+  {name:"Nevada",nick:"Wolf Pack",conf:"Mountain West",state:"Nevada",city:"Reno"},
+  {name:"UNLV",nick:"Rebels",conf:"Mountain West",state:"Nevada",city:"Las Vegas"},
+];
+
+const CONF_COLORS = {
+  "SEC":"#1D9E75","Big Ten":"#185FA5","ACC":"#993C1D",
+  "Big 12":"#BA7517","Pac-12":"#3C3489","Mountain West":"#533B8A","Independent":"#5F5E5A"
+};
+const TOTAL_Q = 10;
+let queue=[], idx=0, score=0, streak=0, results=[], answered=false;
+
+function shuffle(arr){
+  const a=[...arr];
+  for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}
+  return a;
+}
+function normalize(s){ return s.trim().toLowerCase().replace(/[^a-z ]/g,'').replace(/\s+/g,' '); }
+function accepted(input, city){
+  const i=normalize(input), c=normalize(city);
+  if(i===c) return true;
+  // allow common abbreviations
+  const aliases = {"ft worth":"fort worth","ft. worth":"fort worth","west laf":"west lafayette","univ park":"university park","coral gables":"coral gables","coral gable":"coral gables","baton rouge":"baton rouge"};
+  return (aliases[i]||i) === (aliases[c]||c);
+}
+
+function loadQuestion(){
+  const school = queue[idx];
+  answered = false;
+
+  document.getElementById('q-val').textContent = (idx+1)+' / '+TOTAL_Q;
+  document.getElementById('progress-bar').style.width = Math.round((idx/TOTAL_Q)*100)+'%';
+
+  const badge = document.getElementById('conf-badge');
+  const cc = CONF_COLORS[school.conf]||'#888';
+  badge.textContent = school.conf;
+  badge.style.cssText = `background:${cc}18;color:${cc};border:1px solid ${cc}44;`;
+
+  document.getElementById('school-name').textContent = school.name;
+  document.getElementById('school-nickname').textContent = 'The '+school.nick;
+  document.getElementById('state-name').textContent = school.state;
+
+  const inp = document.getElementById('city-input');
+  inp.value=''; inp.disabled=false; inp.className='';
+  inp.placeholder='Type the city…';
+  document.getElementById('submit-btn').disabled=true;
+  document.getElementById('result-banner').className='';
+  document.getElementById('result-banner').textContent='';
+  document.getElementById('next-btn').className='';
+  inp.focus();
+}
+
+const inp = document.getElementById('city-input');
+inp.addEventListener('input', function(){
+  document.getElementById('submit-btn').disabled = this.value.trim().length < 2;
+});
+inp.addEventListener('keydown', function(e){
+  if(e.key==='Enter' && !document.getElementById('submit-btn').disabled && !answered)
+    document.getElementById('submit-btn').click();
+});
+
+document.getElementById('submit-btn').addEventListener('click', function(){
+  if(answered) return;
+  const school = queue[idx];
+  const val = document.getElementById('city-input').value;
+  const ok = accepted(val, school.city);
+  answered=true;
+  document.getElementById('submit-btn').disabled=true;
+  document.getElementById('city-input').disabled=true;
+
+  if(ok){
+    score++;
+    streak++;
+    document.getElementById('city-input').classList.add('correct-input');
+    showBanner('win','✓ Correct! '+school.city+', '+school.state);
+  } else {
+    streak=0;
+    document.getElementById('city-input').classList.add('wrong-input');
+    showBanner('lose','✗ The answer is '+school.city);
+  }
+  document.getElementById('score-val').textContent=score;
+  document.getElementById('streak-val').textContent=streak;
+  results.push({school:school.name,correct:ok,given:val,answer:school.city});
+
+  document.getElementById('next-btn').textContent = idx < TOTAL_Q-1 ? 'Next school →' : 'See results →';
+  document.getElementById('next-btn').className='show';
+});
+
+function showBanner(cls, msg){
+  const b=document.getElementById('result-banner');
+  b.textContent=msg; b.className='show '+cls;
+}
+
+document.getElementById('next-btn').addEventListener('click', function(){
+  idx++;
+  if(idx >= TOTAL_Q){ showEnd(); return; }
+  loadQuestion();
+});
+
+function showEnd(){
+  document.getElementById('school-card').style.display='none';
+  document.getElementById('play-area').style.display='none';
+  document.getElementById('scorebar').style.display='none';
+  document.getElementById('progress-wrap').style.display='none';
+  document.getElementById('progress-bar').style.width='100%';
+
+  const pct=Math.round((score/TOTAL_Q)*100);
+  const trophy = pct===100?'🏆':pct>=80?'🥇':pct>=60?'🥈':pct>=40?'🥉':'😅';
+  const title = pct===100?'Perfect Score!':pct>=80?'College Scholar':pct>=60?'Solid Effort':pct>=40?'Keep Studying':'Back to the Map';
+  document.getElementById('trophy').textContent=trophy;
+  document.getElementById('end-title').textContent=title;
+  document.getElementById('end-sub').textContent=`${score} out of ${TOTAL_Q} correct (${pct}%)`;
+
+  const bd = document.getElementById('end-breakdown');
+  bd.innerHTML = results.map(r=>`
+    <div class="breakdown-row">
+      <span class="breakdown-school">${r.school}</span>
+      <span class="breakdown-answer ${r.correct?'bd-correct':'bd-wrong'}">${r.correct?'✓ '+r.answer:'✗ '+r.answer+(r.given?' (you: '+r.given+')':'')}</span>
+    </div>`).join('');
+
+  document.getElementById('end-screen').className='show';
+}
+
+document.getElementById('play-again-btn').addEventListener('click', function(){
+  score=0; streak=0; idx=0; results=[];
+  document.getElementById('score-val').textContent='0';
+  document.getElementById('streak-val').textContent='0';
+  document.getElementById('school-card').style.display='';
+  document.getElementById('play-area').style.display='';
+  document.getElementById('scorebar').style.display='';
+  document.getElementById('progress-wrap').style.display='';
+  document.getElementById('end-screen').className='';
+  queue = shuffle(SCHOOLS).slice(0, TOTAL_Q);
+  loadQuestion();
+});
+
+queue = shuffle(SCHOOLS).slice(0, TOTAL_Q);
+loadQuestion();
+</script>
+</body>
+</html>
